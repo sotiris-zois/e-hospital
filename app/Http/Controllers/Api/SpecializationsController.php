@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Api\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Specialization;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Throwable;
 
 class SpecializationsController extends Controller
@@ -15,23 +15,25 @@ class SpecializationsController extends Controller
 
         try {
             $this->validate($request, [
-                'search' => 'required|string|min:3',
-                'type' => 'required|string|in:public,private'
+                'term' => 'required|string|min:2',
             ]);
 
-            $search = $request->get('search');
+            $search = $request->get('term');
 
-            $specializations = Specialization::where(function (QueryBuilder $query) use ($search) {
-                $query->where('grouping', 'like', $search . '%');
-                $query->orWhere('classification', 'like', $search . '%');
-                $query->orWhere('specialization', 'like', $search . '%');
-            })->useIndex(
-                ['grouping_index', 'classification_index', 'specialization_index']
-            )->get();
+            $specializations = Specialization::where('specialization','like',$search.'%')
+            ->useIndex('specialization_index')
+            ->get();
 
-            dd($specializations);
+            $response = response()->json(
+                [
+                    'specializations' => $specializations
+                ]
+            );
+
         } catch (Throwable $error) {
+            $response = $this->errorResponse($error);
         } finally {
+            return $response;
         }
     }
 }

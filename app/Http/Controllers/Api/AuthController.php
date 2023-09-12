@@ -15,16 +15,17 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         try {
-            $credentials = $request->only(['username', 'password', 'remember_me']);
-            $credentials =  [
-                    'username' => $credentials['username'],
-                    'password' => $credentials['password']
-            ];
+            $this->validate($request,[
+                'username' => 'required|string',
+                'password' =>  'required|string'
+            ]);
 
-            if (!Auth::attempt($credentials,$credentials['rememebr_me'])) {
+            $credentials = $request->only(['username','password']);
+
+            if (!auth('sanctum')->attempt($credentials)) {
                 throw new Exception('Invalid credentials. Try again');
             }
-            $user = Auth::user();
+            $user = auth('sanctum')->user();
 
             $response = $this->loginSuccess($user);
 
@@ -35,17 +36,32 @@ class AuthController extends Controller
         }
     }
 
-    protected function loginSuccess(User $user){
+    private function setLink(string $role) : string {
+        switch($role){
+            case 'doctor':
+                $link = '/doctor/home';
+                break;
+            case 'patient':
+                $link = '/patient/home';
+                break;
+            default:
+                throw new Exception('Invalid role');
+        }
+        return $link;
+    }
+
+    protected function loginSuccess(User $user) : JsonResponse{
         return response()->json([
             'user' => [
                 'username' => $user->username,
-                'token' => $user->createToken('api')
+                'token' => $user->createToken($user->id.'api')
             ],
+            'link' => $this->setLink($user->role),
             'errorCaught' => false
         ]);
     }
 
-    public function logout(){
+    public function logout() : JsonResponse{
         try{
             $user = Auth::user();
 

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>e-Hospital</title>
+
+    <!-- Fonts -->
+    <link href="../css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="../css/select2.min.css" rel="stylesheet" />
+
+</head>
+
+<body>
+    <h1 class="d-flex justify-content-center">Welcome to e-hospital</h1>
+    <p class="d-flex justify-content-center">
+        As a guest, you can search for doctors and clinics.<BR>
+        To book an appointment, or request a prescription, please<BR>
+        register or login to your account<BR>
+    </p>
+    <hr size="20" />
+    <ul class="nav d-flex justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/register">Register </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+    </ul>
+    <div class="row">
+        <div class="col-6">
+            <input type="text" class="form-control" placeholder="First or Last name" aria-label="First or Last name">
+        </div>
+        <div class="col">
+            <select id="specialty"></select>
+        </div>
+    </div>
+</body>
+<script src="../js/jquery-3.7.1.min.js"></script>
+<script src="../js/select2.min.js"></script>
+<script src="../js/sb-admin-2.min.js"></script>
+<script type="text/javascript">
+
+    $.ajax({
+        type: 'GET',
+        url: '/api/user',
+        dataType: 'JSON',
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        success: (response) => {
+            if (response.user && response.link) {
+
+                let token = response.user.token.plainTextToken;
+                localStorage.setItem('token', token);
+
+                let authUser = JSON.stringify(response.user);
+                localStorage.setItem('user', authUser);
+
+                window.location.href = response.link;
+            }
+        },
+        error: (errorResponse) => {
+            console.log(errorResponse);
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+        }
+    });
+
+    $('#specialty').select2({
+        minimumInputLength: 2,
+        placeholder: 'Select a specialty',
+        width: "100%",
+        ajax: {
+            url: '/api/search-specialties',
+            dataType: 'json',
+            delay: 250,
+            processResults: function (response) {
+
+                let specializations = response.specializations;
+
+                // Map the data to Select2-compatible format
+                let formattedData = [];
+                specializations.forEach((item) => {
+                    let tmpSpecialization = {
+                        id: item.id,
+                        text: item.specialization
+                    };
+                    formattedData.push(tmpSpecialization);
+                });
+
+                return {
+                    results: formattedData
+                };
+            }
+        }
+    });
+</script>
+
+</html>

@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,7 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    $path = resource_path('pages/welcome.html');
-    return file_get_contents($path);
-});
+Route::get('/', [PageController::class,'index']);
+Route::get('login',[PageController::class,'loginForm']);
