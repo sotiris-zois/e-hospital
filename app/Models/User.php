@@ -12,7 +12,7 @@ use VPominchuk\ModelUseIndex;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, ModelUseIndex;
+    use HasApiTokens, HasFactory, Notifiable, ModelUseIndex;
 
     /**
      * The attributes that are mass assignable.

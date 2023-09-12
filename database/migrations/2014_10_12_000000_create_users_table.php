@@ -18,7 +18,6 @@ return new class extends Migration
             $table->enum('role',['doctor','patient'])->index('role_index');
             $table->rememberToken()->index('remember_token_index');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

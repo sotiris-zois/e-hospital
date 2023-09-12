@@ -17,7 +17,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    $requestedUser = $request->user();
+
+    $authUser = auth()->user();
+
+    if($requestedUser->id === $authUser->id){
+        return [
+            'user' => [
+                'username' => $authUser->username,
+                'token' => $request->bearerToken()
+            ],
+        ];
+    }
 });
 Route::get('search-specialties', [SpecializationsController::class,'search']);
 Route::post('login', [AuthController::class,'login']);
