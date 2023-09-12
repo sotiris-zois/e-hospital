@@ -9,6 +9,7 @@ use Throwable;
 use Exception;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -22,14 +23,18 @@ class AuthController extends Controller
 
             $credentials = $request->only(['username','password']);
 
-            if (!auth('sanctum')->attempt($credentials)) {
+            if (!auth()->attempt($credentials)) {
                 throw new Exception('Invalid credentials. Try again');
             }
-            $user = auth('sanctum')->user();
+            $user = auth()->user();
 
             $response = $this->loginSuccess($user);
 
-        } catch (Throwable $error) {
+        }
+        catch(ValidationException $exception){
+            $response = $this->validationError($exception);
+        }
+        catch (Throwable $error) {
             $response = $this->errorResponse($error);
         } finally {
             return $response;
@@ -84,5 +89,15 @@ class AuthController extends Controller
         finally{
             return $response;
         }
+    }
+
+    protected function validationError(ValidationException $exception){
+        return response()->json([
+            'validationError' => true,
+            'messages' => $exception->errors(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => $exception->getTrace(),
+        ]);
     }
 }
