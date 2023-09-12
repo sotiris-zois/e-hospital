@@ -16,19 +16,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    $requestedUser = $request->user();
+Route::middleware('auth:sanctum')->group(function () {
 
-    $authUser = auth()->user();
+    Route::get('/user', function (Request $request) {
 
-    if($requestedUser->id === $authUser->id){
-        return [
-            'user' => [
-                'username' => $authUser->username,
-                'token' => $request->bearerToken()
-            ],
-        ];
-    }
+        $requestedUser = $request->user();
+
+        $authUser = auth()->user();
+
+        if ($requestedUser->id === $authUser->id) {
+            return [
+                'user' => [
+                    'username' => $authUser->username,
+                    'token' => $request->bearerToken()
+                ],
+            ];
+        }
+    });
+    Route::post('logout',[AuthController::class,'logout']);
 });
-Route::get('search-specialties', [SpecializationsController::class,'search']);
-Route::post('login', [AuthController::class,'login']);
+Route::get('search-specialties', [SpecializationsController::class, 'search']);
+Route::post('login', [AuthController::class, 'login']);

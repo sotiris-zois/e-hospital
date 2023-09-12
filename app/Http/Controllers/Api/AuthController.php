@@ -59,7 +59,7 @@ class AuthController extends Controller
         return response()->json([
             'user' => [
                 'username' => $user->username,
-                'token' => $user->createToken($user->id.'api')
+                'token' => $user->createToken($user->id.'_api')
             ],
             'link' => $this->setLink($user->role),
             'errorCaught' => false
@@ -68,11 +68,9 @@ class AuthController extends Controller
 
     public function logout() : JsonResponse{
         try{
-            $user = Auth::user();
+            $user = auth('sanctum')->user();
 
-            $tokens = $user->tokens();
-
-            foreach($tokens as $token){
+            foreach($user->tokens as $token){
                 $token->delete();
             }
 
