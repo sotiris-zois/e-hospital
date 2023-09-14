@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\SpecializationsController;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,23 +18,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->group(function () {
-
-    Route::get('/user', function (Request $request) {
-
-        $requestedUser = $request->user();
-
-        $authUser = auth()->user();
-
-        if ($requestedUser->id === $authUser->id) {
-            return [
-                'user' => [
-                    'username' => $authUser->username,
-                    'token' => $request->bearerToken()
-                ],
-            ];
-        }
-    });
+    Route::get('/user', [AuthController::class,'currentUser']);
     Route::post('logout',[AuthController::class,'logout']);
+    Route::get('register',[AuthController::class,'registerUser']);
 });
 Route::get('search-specialties', [SpecializationsController::class, 'search']);
 Route::post('login', [AuthController::class, 'login']);

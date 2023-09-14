@@ -17,4 +17,10 @@ class PageController extends Controller
 
         return file_get_contents($path);
     }
+
+    public function doctorDashboard(){
+        $path = public_path('pages/doctor/dashboard.html');
+
+        return file_get_contents($path);
+    }
 }

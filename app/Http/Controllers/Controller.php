@@ -19,6 +19,6 @@ class Controller extends BaseController
             'file' => $error->getFile(),
             'line' => $error->getLine(),
             'trace' => $error->getTrace(),
-        ]);
+        ],500);
     }
 }

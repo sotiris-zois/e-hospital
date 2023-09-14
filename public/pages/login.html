@@ -40,93 +40,67 @@
                                 <div class="p-5">
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                                    </div>
-                                    <form id="loginForm">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control form-control-user" id="username"
-                                                aria-describedby="emailHelp" placeholder="Username...">
+                                        <div class="h4 text-gray-900 mb-4 alert alert-danger d-none">
                                         </div>
-                                        <div class="form-group">
-                                            <input type="password" class="form-control form-control-user" id="password"
-                                                placeholder="Password">
+
                                         </div>
-                                        <input type="submit" class="btn btn-primary btn-user btn-block" value="Login">
+                                        <form id="loginForm">
+                                            <div class="form-group">
+                                                <input type="text" class="form-control form-control-user" id="username"
+                                                    aria-describedby="emailHelp" placeholder="Username...">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="password" class="form-control form-control-user"
+                                                    id="password" placeholder="Password">
+                                            </div>
+                                            <input type="submit" class="btn btn-primary btn-user btn-block"
+                                                value="Login">
+                                            <hr>
+                                        </form>
                                         <hr>
-                                    </form>
-                                    <hr>
-                                    <div id="errorDiv" class="alert alert-danger d-none">
-                                    </div>
-                                    <div class="text-center">
-                                        <a class="small" href="/forgot-password">Forgot Password?</a>
-                                    </div>
-                                    <div class="text-center">
-                                        <a class="small" href="/register">Create an Account!</a>
+                                        <div id="errorDiv" class="alert alert-danger d-none">
+                                        </div>
+                                        <div class="text-center">
+                                            <a class="small" href="/forgot-password">Forgot Password?</a>
+                                        </div>
+                                        <div class="text-center">
+                                            <a class="small" href="/register">Create an Account!</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
             </div>
 
         </div>
 
-    </div>
+        <!-- Bootstrap core JavaScript-->
+        <script src="../vendor/jquery/jquery.min.js"></script>
+        <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.min.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- Core plugin JavaScript-->
+        <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+        <!-- Custom scripts for all pages-->
+        <script src="../js/sb-admin-2.min.js"></script>
+        <script>
+            let errorDiv = $('#errorDiv');
 
-    <!-- Custom scripts for all pages-->
-    <script src="../js/sb-admin-2.min.js"></script>
-    <script>
-        let errorDiv = $('#errorDiv');
-
-        $.ajax({
-            type: 'GET',
-            url: '/api/user',
-            dataType: 'JSON',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('token')
-            },
-            success: (response) => {
-                if (response.user && response.link) {
-
-                    let token = response.user.token.plainTextToken;
-                    localStorage.setItem('token', token);
-
-                    let authUser = JSON.stringify(response.user);
-                    localStorage.setItem('user', authUser);
-
-                    window.location.href = response.link;
-                }
-            },
-            error: (errorResponse) => {
-
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-            }
-        });
-
-        $("#loginForm").on('submit', (event) => {
-            event.preventDefault();
             $.ajax({
-                type: 'POST',
-                url: '/api/login',
+                type: 'GET',
+                url: '/api/user',
                 dataType: 'JSON',
-                data: {
-                    username: $('#username').val(),
-                    password: $('#password').val(),
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 success: (response) => {
-
                     if (response.user && response.link) {
 
-                        let token = response.user.token.plainTextToken;
+                        let token = response.user.token;
                         localStorage.setItem('token', token);
 
                         let authUser = JSON.stringify(response.user);
@@ -134,32 +108,66 @@
 
                         window.location.href = response.link;
                     }
-                    else if(response.validationError){
-                        let messages = response.messages;
-                        let text = '';
-
-                        if(messages.username){
-                            messages.username.forEach((message) => {
-                                text += message +'<BR>';
-                            });
-                        }
-                        if(messages.password){
-                            messages.password.forEach((message) => {
-                                text += message +'<BR>';
-                            });
-                        }
-                        errorDiv.removeClass('d-none').html(text);
-                    }
                 },
                 error: (errorResponse) => {
-                     errorDiv.removeClass('d-none');
-                    errorDiv.text(response.responseText);
+                    errorResponse = errorResponse.responseJSON;
+
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                 }
             });
-        });
-    </script>
+
+            $("#loginForm").on('submit', (event) => {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/login',
+                    dataType: 'JSON',
+                    data: {
+                        username: $('#username').val(),
+                        password: $('#password').val(),
+                    },
+                    success: (response) => {
+
+                        if (response.user && response.link) {
+
+                            let token = response.user.token;
+                            localStorage.setItem('token', token);
+
+                            let authUser = JSON.stringify(response.user);
+                            localStorage.setItem('user', authUser);
+
+                            window.location.href = response.link;
+                        }
+                    },
+                    error: (errorResponse) => {
+
+                        errorResponse = errorResponse.responseJSON;
+
+                        if (errorResponse.validationError) {
+                            let messages = errorResponse.messages;
+                            let text = '';
+
+                            if (messages.username) {
+                                messages.username.forEach((message) => {
+                                    text += message + '<BR>';
+                                });
+                            }
+                            if (messages.password) {
+                                messages.password.forEach((message) => {
+                                    text += message + '<BR>';
+                                });
+                            }
+                            errorDiv.removeClass('d-none').html(text);
+                        }
+                        errorDiv.removeClass('d-none');
+                        errorDiv.text(errorResponse.responseText);
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                    }
+                });
+            });
+        </script>
 </body>
 
 </html>
