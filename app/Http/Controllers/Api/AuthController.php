@@ -16,18 +16,12 @@ class AuthController extends Controller
     {
 
         try {
-            $requestedUser = $request->user();
+            $requestedUser = $request?->user();
 
-            $authUser = auth()->user();
+            $authUser = auth()?->user();
 
-            if ($requestedUser->id === $authUser->id) {
-                $response = response()->json([
-                    'user' => [
-                        'username' => $authUser->username,
-                        'token' => $authUser->tokens->first()
-                    ],
-                    'link' => $this->setLink($authUser->role)
-                ]);
+            if ($requestedUser?->id === $authUser?->id) {
+                $response = $this->successResponse($authUser);
             }
         } catch (Throwable $error) {
             $response = $this->errorResponse($error);
@@ -132,6 +126,7 @@ class AuthController extends Controller
             $data = $request->only(['username','password','role']);
 
             $user = User::create($data);
+
 
             $response = $this->successResponse($user);
 

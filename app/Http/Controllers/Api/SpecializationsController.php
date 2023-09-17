@@ -24,11 +24,7 @@ class SpecializationsController extends Controller
             ->useIndex('specialization_index')
             ->get();
 
-            $response = response()->json(
-                [
-                    'specializations' => $specializations
-                ]
-            );
+            $response = response()->json($specializations);
 
         } catch (Throwable $error) {
             $response = $this->errorResponse($error);

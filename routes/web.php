@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PageController::class,'index'])->name('home');
 Route::get('login',[PageController::class,'loginForm'])->name('login');
+
 Route::prefix('doctor')->group(function(){
-    Route::get('/home',[PageController::class,'doctorDashboard']);
+    Route::get('/home',[PageController::class,'doctorDashboard'])->name('doctor.home');
 });

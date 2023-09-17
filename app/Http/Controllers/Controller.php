@@ -14,7 +14,6 @@ class Controller extends BaseController
 
     protected function errorResponse(Throwable $error) : JsonResponse{
         return response()->json([
-            'errorCaught' => true,
             'message' => $error->getMessage(),
             'file' => $error->getFile(),
             'line' => $error->getLine(),

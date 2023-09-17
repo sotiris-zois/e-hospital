@@ -161,7 +161,7 @@
                             errorDiv.removeClass('d-none').html(text);
                         }
                         errorDiv.removeClass('d-none');
-                        errorDiv.text(errorResponse.responseText);
+                        errorDiv.text(errorResponse.message);
                         localStorage.removeItem('token');
                         localStorage.removeItem('user');
                     }
